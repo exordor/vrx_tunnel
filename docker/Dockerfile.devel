@@ -1,26 +1,8 @@
-# Ubuntu 24.04 
-FROM osrf/ros:jazzy-desktop-full
+FROM vrx-base AS vrx-devel
 
-# Setup timezone
-ENV TZ=Etc/UTC
-RUN echo $TZ > /etc/timezone && \
-    ln -fs /usr/share/zoneinfo/$TZ /etc/localtime && \
-    apt update && \
-    apt install -y locales && \
-    locale-gen en_US en_US.UTF-8 && \
-    update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8
-
-# Set up repo to install Gazebo
-RUN curl -s https://packages.osrfoundation.org/gazebo.gpg -o /usr/share/keyrings/pkgs-osrf-archive-keyring.gpg && \
-    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/pkgs-osrf-archive-keyring.gpg] http://packages.osrfoundation.org/gazebo/ubuntu-stable $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/gazebo-stable.list > /dev/null
-
-  # Install some 'standard' ROS packages and utilities.
-RUN . /opt/ros/jazzy/setup.sh \
-  && apt update \
+# Install some 'standard' ROS packages and utilities.
+RUN apt update \
   && apt install -y --no-install-recommends \
-     gz-harmonic \
-     python3-colcon-common-extensions \
-     python3-vcstool \
      ros-${ROS_DISTRO}-ackermann-msgs \
      ros-${ROS_DISTRO}-actuator-msgs \
      ros-${ROS_DISTRO}-ament-cmake-pycodestyle \
@@ -43,7 +25,6 @@ RUN . /opt/ros/jazzy/setup.sh \
 
 # Tools necessary and useful during development
 RUN apt update && \
- DEBIAN_FRONTEND=noninteractive \
  apt install --no-install-recommends -y \
         atop \
         expect \
@@ -61,3 +42,28 @@ RUN apt update && \
         xvfb \
 && rm -rf /var/lib/apt/lists/* \
 && apt clean -qq
+
+# Nvidia setup
+RUN dpkg --add-architecture i386 && \
+    apt-get update && apt-get install -y --no-install-recommends \
+        libxau6 libxau6:i386 \
+        libxdmcp6 libxdmcp6:i386 \
+        libxcb1 libxcb1:i386 \
+        libxext6 libxext6:i386 \
+        libx11-6 libx11-6:i386 \
+        libglvnd0 libglvnd0:i386 \
+        libgl1 libgl1:i386 \
+        libglx0 libglx0:i386 \
+        libegl1 libegl1:i386 \
+        libgles2 libgles2:i386 \
+    && rm -rf /var/lib/apt/lists/* \
+    && apt clean -qq
+
+WORKDIR /ws
+
+COPY entrypoint-ros.sh /entrypoint-ros.sh
+RUN chmod +x /entrypoint-ros.sh
+
+# USER ubuntu
+
+ENTRYPOINT ["/entrypoint-ros.sh"]
