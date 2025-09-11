@@ -44,6 +44,15 @@ def launch(context, *args, **kwargs):
     if config_file and config_file != '':
         with open(config_file, 'r') as stream:
             models = Model.FromConfig(stream)
+        # If a CLI URDF is provided, override the models' URDFs
+        if robot_urdf and robot_urdf != '':
+            if robot and robot != '':
+                for m in models:
+                    if m.model_name == robot:
+                        m.set_urdf(robot_urdf)
+            else:
+                for m in models:
+                    m.set_urdf(robot_urdf)
     else:
       m = Model(robot_name, model_type, [-532, 162, 0, 0, 0, 1])
       if robot_urdf and robot_urdf != '':

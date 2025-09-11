@@ -374,6 +374,10 @@ class Model:
         if 'flight_time' in config:
             model.set_flight_time(config['flight_time'])
 
+        # Optional: allow YAML to point to a custom URDF
+        if 'urdf' in config and config['urdf']:
+            model.set_urdf(config['urdf'])
+
         if 'payload' in config:
             model.set_payload(config['payload'])
 

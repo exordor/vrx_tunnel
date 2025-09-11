@@ -369,8 +369,10 @@ def spawn(sim_mode, world_name, models, robot=None):
                 output='screen',
             ))
 
-            # robot_state_publisher (tf for wamv)
-            model_dir = os.path.join(get_package_share_directory('vrx_gazebo'), 'models/wamv/tmp')
+            # robot_state_publisher (tf for WAM-V). Use model_name-specific tmp path
+            model_dir = os.path.join(
+                get_package_share_directory('vrx_gazebo'),
+                'models', model.model_name, 'tmp')
             urdf_file = os.path.join(model_dir, 'model.urdf')
             with open(urdf_file, 'r') as infp:
                 robot_desc = infp.read()
