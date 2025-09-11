@@ -149,6 +149,10 @@ install(
   TARGETS AcousticTrackingScoringPlugin
   DESTINATION lib)
 
+# Install configs (spawn presets, patterns, etc.)
+install(DIRECTORY config/
+  DESTINATION share/${PROJECT_NAME}/config)
+
 # Plugins
 list(APPEND VRX_GZ_PLUGINS
   AcousticPingerPlugin
