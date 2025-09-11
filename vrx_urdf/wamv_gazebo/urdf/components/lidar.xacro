@@ -1,12 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <robot xmlns:xacro="http://ros.org/wiki/xacro">
   <xacro:include filename="$(find wamv_gazebo)/urdf/components/wamv_3d_lidar.xacro"/>
+  <xacro:include filename="$(find wamv_gazebo)/urdf/components/wamv_rgl_lidar.xacro"/>
   <xacro:macro name="lidar"
                params = "type:='16_beam'
                          name
                          x:=0.7 y:=0 z:=1.8
                          R:=0 P:=0 Y:=0
-                         post_Y:=0 post_z_from:=1.2965">
+                         post_Y:=0 post_z_from:=1.2965
+                         use_post:=true
+                         update_rate:=10
+                         min_range:=0.2 max_range:=60
+                         update_on_paused_sim:=true
+                         topic:=scan_omni
+                         frame:=''
+                         pattern_preset_path:=''
+                         plugin_filename:='RGLServerPluginInstance'
+                         plugin_name:='rgl::RGLServerPluginInstance'">
     <xacro:if value="${type == '16_beam'}">
       <xacro:wamv_3d_lidar name="${name}"
                            x="${x}" y="${y}" z="${z}"
@@ -25,6 +35,20 @@
                            samples="2187"
                            min_vertical_angle="-0.186"
                            max_vertical_angle="0.54"/>
+    </xacro:if>
+    <xacro:if value="${type == 'rgl'}">
+      <xacro:wamv_rgl_lidar name="${name}"
+                            x="${x}" y="${y}" z="${z}"
+                            R="${R}" P="${P}" Y="${Y}"
+                            post_Y="${post_Y}" post_z_from="${post_z_from}"
+                            use_post="${use_post}"
+                            update_rate="${update_rate}"
+                            min_range="${min_range}" max_range="${max_range}"
+                            update_on_paused_sim="${update_on_paused_sim}"
+                            topic="${topic}" frame="${frame}"
+                            pattern_preset_path="${pattern_preset_path}"
+                            plugin_filename="${plugin_filename}"
+                            plugin_name="${plugin_name}"/>
     </xacro:if>
   </xacro:macro>
 </robot>
