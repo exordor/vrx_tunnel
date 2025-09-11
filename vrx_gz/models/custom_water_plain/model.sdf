@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<sdf version="1.8">
+  <model name="custom_water_plain">
+    <static>true</static>
+    <link name="link">
+      <visual name="water_visual">
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <plane>
+            <normal>0 0 1</normal>
+            <size>200 200</size>
+          </plane>
+        </geometry>
+        <material>
+          <ambient>0.0 0.1 0.2 1.0</ambient>
+          <diffuse>0.0 0.15 0.25 1.0</diffuse>
+          <specular>0.2 0.2 0.2 1.0</specular>
+        </material>
+        <!-- Put water on a dedicated visibility layer 8 so GPU lidars (mask 7) ignore it -->
+        <visibility_flags>6</visibility_flags>
+      </visual>
+      <!-- No collision: do not block sensors or physics -->
+    </link>
+  </model>
+</sdf>
+
