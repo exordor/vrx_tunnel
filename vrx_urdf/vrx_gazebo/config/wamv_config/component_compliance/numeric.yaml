@@ -45,6 +45,17 @@ lidar:
         P
         Y
         post_Y
+        post_z_from
+        update_rate
+        min_range
+        max_range
+        update_on_paused_sim
+        topic
+        frame
+        pattern_preset_path
+        plugin_filename
+        plugin_name
+        use_post
 
 wamv_ball_shooter:
     num: 1
