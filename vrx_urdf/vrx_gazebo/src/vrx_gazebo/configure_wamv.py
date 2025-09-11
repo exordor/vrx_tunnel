@@ -3,6 +3,7 @@ import rclpy
 from rclpy.node import Node
 
 import os
+import subprocess
 
 from vrx_gazebo.compliance import ComponentCompliance
 from vrx_gazebo.compliance import ThrusterCompliance
@@ -148,25 +149,31 @@ def main(args=None):
     # Add xacro files if created
     if received_thruster_yaml:
         thruster_xacro_target = os.path.splitext(thruster_yaml)[0] + '.xacro'
+        # Ensure absolute path so xacro include resolves regardless of CWD
+        thruster_xacro_target = os.path.abspath(thruster_xacro_target)
         create_urdf_command += (" yaml_thruster_generation:=true "
                                 "thruster_xacro_file:=" +
                                 thruster_xacro_target)
     if received_component_yaml:
         component_xacro_target = os.path.splitext(component_yaml)[0] + '.xacro'
+        # Ensure absolute path so xacro include resolves regardless of CWD
+        component_xacro_target = os.path.abspath(component_xacro_target)
         create_urdf_command += (" yaml_component_generation:=true "
                                 "component_xacro_file:=" + component_xacro_target)
 
-    # Create urdf and print to console
-    os.system(create_urdf_command)
-    if not (thruster_compliant and component_compliant):
+    # Create urdf and report status
+    ret = subprocess.call(create_urdf_command, shell=True)
+    if ret != 0 or not os.path.isfile(wamv_target):
+        node.get_logger().error('URDF generation failed (exit code: %s). Check xacro errors above.' % ret)
+    elif not (thruster_compliant and component_compliant):
         node.get_logger().error('\nThis component/thruster configuration is NOT compliant ' +
                                 'with the (current) VRX constraints. A urdf file will ' +
                                 'be created, but please note that the above errors ' +
                                 'must be fixed for this to be a valid configuration ' +
                                 'for the VRX competition.\n')
-
-    print('WAM-V urdf file sucessfully generated. File location: ' +
-          wamv_target)
+    if os.path.isfile(wamv_target):
+        print('WAM-V urdf file sucessfully generated. File location: ' +
+              wamv_target)
 
     node.destroy_node()
     rclpy.shutdown()
@@ -174,4 +181,3 @@ def main(args=None):
 
 if __name__ == '__main__':
     main()
-
