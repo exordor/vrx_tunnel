@@ -85,8 +85,9 @@
   <gazebo>
     <plugin filename="libgz-sim-pose-publisher-system.so"
       name="gz::sim::systems::PosePublisher">
+      <!-- RobotStatePublisher already handles link frames; avoid noisy sensor entity frames. -->
       <publish_link_pose>false</publish_link_pose>
-      <publish_sensor_pose>true</publish_sensor_pose>
+      <publish_sensor_pose>false</publish_sensor_pose>
       <publish_collision_pose>false</publish_collision_pose>
       <publish_visual_pose>false</publish_visual_pose>
       <publish_nested_model_pose>false</publish_nested_model_pose>

@@ -112,6 +112,7 @@ def imu(world_name, model_name, link_name, sensor_name):
         ros_type='sensor_msgs/msg/Imu',
         direction=BridgeDirection.GZ_TO_ROS)
 
+
 def navsat(world_name, model_name, link_name, sensor_name):
     gz_sensor_prefix = gz_prefix(world_name, model_name, link_name, sensor_name)
     ros_sensor_prefix = ros_prefix('', 'gps')
@@ -195,8 +196,10 @@ def payload_bridges(world_name, model_name, link_name, sensor_name, sensor_type)
             camera_info(world_name, model_name, link_name, sensor_name)
         ]
     elif sensor_type == sdf.Sensortype.IMU:
+        # Only bridge the original topic ending with /imu/data.
+        # A relay node rewrites frame_id and republishes to /sensors/imu/data.
         bridges = [
-            imu(world_name, model_name, link_name, sensor_name)
+            imu(world_name, model_name, link_name, sensor_name),
         ]
     elif sensor_type == sdf.Sensortype.CONTACT:
         bridges = [

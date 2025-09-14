@@ -26,6 +26,7 @@ from launch.actions import ExecuteProcess, EmitEvent
 from launch.events import Shutdown
 
 from launch_ros.actions import Node
+from launch.conditions import IfCondition
 from launch_ros.actions import PushRosNamespace
 
 import vrx_gz.bridges
@@ -369,6 +370,32 @@ def spawn(sim_mode, world_name, models, robot=None):
                 output='screen',
             ))
 
+            # IMU frame_id relay: subscribe to legacy /sensors/imu/imu/data,
+            # normalize frame_id to the link frame, and republish to
+            # /sensors/imu/data so RViz and consumers have a stable frame.
+            nodes.append(Node(
+                package='vrx_ros',
+                executable='imu_frame_relay',
+                output='screen',
+                parameters=[{'input': 'sensors/imu/imu/data',
+                             'output': 'sensors/imu/data',
+                             'frame_id': ''}],
+            ))
+
+            # Auto-forward controller (simple constant thrust, optional)
+            nodes.append(Node(
+                package='vrx_ros',
+                executable='auto_forward',
+                output='screen',
+                condition=IfCondition(LaunchConfiguration('auto_forward')),
+                parameters=[{
+                    'thrust': LaunchConfiguration('auto_forward_thrust'),
+                    'bias': LaunchConfiguration('auto_forward_bias'),
+                    'rate_hz': LaunchConfiguration('auto_forward_rate'),
+                    'duration_sec': LaunchConfiguration('auto_forward_duration'),
+                }],
+            ))
+
             # robot_state_publisher (tf for WAM-V). Use model_name-specific tmp path
             model_dir = os.path.join(
                 get_package_share_directory('vrx_gazebo'),
@@ -376,7 +403,10 @@ def spawn(sim_mode, world_name, models, robot=None):
             urdf_file = os.path.join(model_dir, 'model.urdf')
             with open(urdf_file, 'r') as infp:
                 robot_desc = infp.read()
-            params = {'use_sim_time': use_sim_time, 'frame_prefix': 'wamv/', 'robot_description': robot_desc}
+            # Avoid double-prefixing TF frames. URDF already names links with
+            # the namespace (e.g., `wamv/base_link`). Do not add another
+            # `frame_prefix` here, so TF matches sensor headers (e.g., RGL).
+            params = {'use_sim_time': use_sim_time, 'robot_description': robot_desc}
             nodes.append(Node(package='robot_state_publisher',
                                   executable='robot_state_publisher',
                                   output='both',

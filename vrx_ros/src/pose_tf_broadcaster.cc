@@ -24,6 +24,8 @@
 
 #include <memory>
 #include <string>
+#include <sstream>
+#include <vector>
 
 using std::placeholders::_1;
 
@@ -48,6 +50,10 @@ class FramePublisher : public rclcpp::Node
         std::bind(&FramePublisher::HandlePoseStatic, this, _1));
   }
 
+  // Note: prior versions included helper functions to normalize frame names
+  // and synthesize identity transforms for sensor entity frames. These have
+  // been removed to restore the original, minimal behavior.
+
   private: void HandlePose(const std::shared_ptr<tf2_msgs::msg::TFMessage> _msg)
   {
     std::string world_frame;
@@ -66,7 +72,7 @@ class FramePublisher : public rclcpp::Node
     }
     else
     {
-      // Send the transformation
+      // Send the transformation unchanged
       this->tfBroadcaster->sendTransform(_msg->transforms);
     }
   }
@@ -89,7 +95,7 @@ class FramePublisher : public rclcpp::Node
     }
     else
     {
-      // Send the transformation
+      // Send the transformation unchanged
       this->tfBroadcasterStatic->sendTransform(_msg->transforms);
     }
   }

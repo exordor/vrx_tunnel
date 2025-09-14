@@ -1,5 +1,10 @@
 import os
-import yaml
+try:
+    import yaml
+except ImportError as e:
+    raise RuntimeError(
+        "PyYAML missing: install with 'sudo apt-get install python3-yaml' or 'pip install pyyaml'"
+    ) from e
 
 
 def create_xacro_file(xacro_target,

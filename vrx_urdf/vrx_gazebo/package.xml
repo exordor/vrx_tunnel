@@ -16,6 +16,8 @@
   <buildtool_depend>ament_cmake</buildtool_depend>
   <exec_depend>rclpy</exec_depend>
   <exec_depend>std_msgs</exec_depend>
+  <!-- YAML is required to parse component/thruster configuration files -->
+  <exec_depend>python3-yaml</exec_depend>
   <export>
     <build_type>ament_cmake</build_type>
   </export>

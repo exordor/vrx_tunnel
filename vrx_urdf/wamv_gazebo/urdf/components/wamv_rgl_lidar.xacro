@@ -17,8 +17,10 @@
                                             plugin_filename:='RGLServerPluginInstance'
                                             plugin_name:='rgl::RGLServerPluginInstance'">
 
-    <!-- Derive default frame if not provided (use Pythonic ternary) -->
-    <xacro:property name="lidar_frame" value="${frame if frame else namespace + '/' + name + '_link'}"/>
+    <!-- Always bind the plugin frame to the actual link frame to ensure TF alignment.
+         Note: The optional 'frame' arg is ignored to avoid mismatches like
+         'front_lidar_link' vs the real link name 'RGLLidar_front_link'. -->
+    <xacro:property name="lidar_frame" value="${namespace + '/' + name + '_link'}"/>
 
     <!-- Define length variables for link positioning -->
     <xacro:property name="platform_z" value="${post_z_from}"/>

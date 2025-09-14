@@ -13,7 +13,9 @@ lidar:
     max_range: 60
     update_on_paused_sim: true
     topic: scan_omni
-    frame: top_lidar_link
+    # frame is auto-bound to the link name (wamv/RGLLidar_top_link) by xacro.
+    # Leave empty or omit to avoid TF mismatches.
+    # frame: ""
     # Path to your RGL pattern preset file
     pattern_preset_path: $(find vrx_gz)/config/rgl_patterns/hesai_qt128_20hz_pattern.mat3x4f
     # Optional: override plugin IDs if your build differs
@@ -25,18 +27,20 @@ lidar:
     # Mount under the hull, ahead of base
     x: 1.20
     y: 0.00
-    z: -0.20
+    z: -0.15
     R: 0.0
-    P: 0.0
+    P: 0.05
     Y: 0.0
     post_Y: 0.0
     use_post: false
     update_rate: 20
     min_range: 0.2
-    max_range: 60
+    max_range: 20
     update_on_paused_sim: true
     topic: scan_front
-    frame: front_lidar_link
+    # frame is auto-bound to the link name (wamv/RGLLidar_front_link) by xacro.
+    # Leave empty or omit to avoid TF mismatches.
+    # frame: ""
     pattern_preset_path: $(find vrx_gz)/config/rgl_patterns/archimedean_spiral_pattern.mat3x4f
     plugin_filename: RGLServerPluginInstance
     plugin_name: rgl::RGLServerPluginInstance
