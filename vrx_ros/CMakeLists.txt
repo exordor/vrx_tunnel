@@ -42,10 +42,24 @@ ament_target_dependencies(pose_tf_broadcaster
   tf2_msgs
 )
 
+add_executable(imu_frame_relay src/imu_frame_relay.cc)
+ament_target_dependencies(imu_frame_relay
+  rclcpp
+  sensor_msgs
+)
+
+add_executable(auto_forward src/auto_forward.cc)
+ament_target_dependencies(auto_forward
+  rclcpp
+  std_msgs
+)
+
 # Resources
 install(TARGETS
   optical_frame_publisher
   pose_tf_broadcaster
+  imu_frame_relay
+  auto_forward
   DESTINATION lib/${PROJECT_NAME})
 install(DIRECTORY
   launch

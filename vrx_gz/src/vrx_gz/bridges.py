@@ -228,3 +228,23 @@ def usv_wind_direction():
         gz_type='gz.msgs.Float',
         ros_type='std_msgs/msg/Float32',
         direction=BridgeDirection.GZ_TO_ROS)
+
+#
+# RGL Lidar bridges
+#
+def rgl_pointcloud(topic: str):
+    """
+    Bridge a GZ RGL point cloud topic to ROS PointCloud2.
+
+    - Expects the RGL plugin to advertise a GZ transport topic named `topic`
+      (e.g. `scan_front`, `scan_omni`). We use an absolute gz topic `/{topic}`
+      to match common plugin behavior, and a relative ROS topic so the
+      model namespace (e.g. `/wamv`) is applied by launch.
+    """
+    # GZ publishes gz.msgs.PointCloudPacked
+    return Bridge(
+        gz_topic=f'/{topic}',
+        ros_topic=f'{topic}',
+        gz_type='gz.msgs.PointCloudPacked',
+        ros_type='sensor_msgs/msg/PointCloud2',
+        direction=BridgeDirection.GZ_TO_ROS)

@@ -60,3 +60,11 @@ joy_teleop:
       message_value:
         data:
           value: true
+
+# Optional: auto-forward controller settings used by tunnel_viz.launch.py
+auto_forward:
+  enable: true
+  thrust: 40.0
+  bias: 0.0
+  rate: 10.0
+  duration: 120.0

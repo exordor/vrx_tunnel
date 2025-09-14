@@ -90,7 +90,12 @@ class Model:
                 vrx_gz.bridges.cmd_vel(self.model_name)
             ])
         elif self.is_USV():
-            pass
+            # RGL lidar point clouds (topics come from plugin config)
+            # Keep ROS topics relative so model namespace applies (e.g., /wamv/scan_front)
+            bridges.extend([
+                vrx_gz.bridges.rgl_pointcloud('scan_front'),
+                vrx_gz.bridges.rgl_pointcloud('scan_omni'),
+            ])
 
         return [bridges, nodes, custom_launches]
 
