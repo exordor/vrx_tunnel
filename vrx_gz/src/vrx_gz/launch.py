@@ -393,6 +393,7 @@ def spawn(sim_mode, world_name, models, robot=None):
                     'bias': LaunchConfiguration('auto_forward_bias'),
                     'rate_hz': LaunchConfiguration('auto_forward_rate'),
                     'duration_sec': LaunchConfiguration('auto_forward_duration'),
+                    'start_delay_sec': LaunchConfiguration('auto_forward_delay'),
                 }],
             ))
 
