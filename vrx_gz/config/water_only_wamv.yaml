@@ -1,3 +1,12 @@
+launch:
+  world: water_only
+  sim_mode: full
+  headless: false
+  paused: false
+  extra_gz_args: ""
+  rviz:
+    enable: true
+
 model_name: wamv
 model_type: wam-v
 urdf: /home/oldsix/code/tunnel_ws/tmp/wamv_rgl.urdf
@@ -68,3 +77,17 @@ auto_forward:
   bias: 0.0
   rate: 10.0
   duration: 120.0
+  start_delay: 5.0
+
+# Optional: rosbag recording configuration
+rosbag:
+  enable: true
+  format: mcap
+  start_delay: 5.0
+  topics:
+    - /clock
+    - /wamv/sensors/imu/data
+    - /wamv/scan_front
+    - /wamv/scan_omni
+    - /tf
+    - /tf_static
