@@ -15,9 +15,9 @@
           <point>0.6 1.03 0</point>
           <point>-1.4 1.03 0</point>
         </points>
-        <wavefield>
+        <!-- <wavefield>
           <topic>/vrx/wavefield/parameters</topic>
-        </wavefield>
+        </wavefield> -->
       </plugin>
 
       <!-- Right hull -->
@@ -32,9 +32,9 @@
           <point>0.6 -1.03 0</point>
           <point>-1.4 -1.03 0</point>
         </points>
-        <wavefield>
+        <!-- <wavefield>
           <topic>/vrx/wavefield/parameters</topic>
-        </wavefield>
+        </wavefield> -->
       </plugin>
 
       <plugin
