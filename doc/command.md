@@ -107,3 +107,9 @@ MOLA_SAVE_TRAJECTORY=true \
 MOLA_TUM_TRAJECTORY_OUTPUT=omni_map_estimated_trajectory.tum \
 mola-lo-gui-rosbag2
 ```
+
+## rgl plugin install
+
+https://github.com/RobotecAI/RGLGazeboPlugin
+
+see their [installation instructions](https://github.com/RobotecAI/RGLGazeboPlugin#installation)
