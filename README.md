@@ -1,70 +1,101 @@
-# Virtual RobotX (VRX)
-This repository is the home to the source code and software documentation for the VRX simulation environment, which supports simulation of unmanned surface vehicles in marine environments.
-* Designed in coordination with RobotX organizers, this project provides arenas and tasks similar to those featured in past and future RobotX competitions, as well as a description of the WAM-V platform.
-* For RobotX competitors this simulation environment is intended as a first step toward developing tools prototyping solutions in advance of physical on-water testing.
-* We also welcome users with simulation needs beyond RobotX. As we continue to improve the environment, we hope to offer support to a wide range of potential applications.
+# VRX Tunnel
 
-## A new modernization development: Gazebo Harmonic and ROS 2 Jazzy
+VRX Tunnel is a ROS 2 + Gazebo Harmonic workspace tailored for running the Virtual RobotX (VRX) environment with a tunnel scene and an RGL LiDAR-based WAM‑V configuration. It builds on upstream VRX packages and adds:
 
-> [!NOTE]
-> This development effort was executed by the
-> [Honu Robotics](https://honurobotics.com) team, thanks to the sponsorship
-> of [RoboNation](https://robonation.org/).
+- A YAML‑driven WAM‑V generation flow (components + thrusters → URDF)
+- A one‑shot launch that first generates the URDF and then starts the sim + RViz
+- Scenario YAMLs that configure world, RViz, auto‑forward motion, rosbag recording, and teleop mappings
 
-We are happy to announce that the repository has been ported to use supported
-versions of Gazebo and ROS 2:
-  * Code is now working with Gazebo Harmonic and ROS 2 Jazzy
-  * This is the recommended configuration for new users.
-  * Users who wish to continue running Gazebo Garden and ROS 2 Humble can still do so using the `humble` branch of this repository.
+This branch targets ROS 2 Jazzy and Gazebo Harmonic.
 
-## The VRX Competition
-The VRX environment is also the "virtual venue" for the [VRX Competition](https://github.com/osrf/vrx/wiki). Please see our Wiki for tutorials and links to registration and documentation relevant to the virtual competition.
+## Features
 
-[![VRX](images/sydney_regatta_gzsim.png)](https://vimeo.com/851696025 "Gazebo Virtual RobotX v. 2.3 - Click to Watch!")
-![ROS 2 CI](https://github.com/osrf/vrx/workflows/ROS%202%20CI/badge.svg)
+- WAM‑V generation from YAML via `vrx_gazebo` generator
+- Tunnel visualization scenario with RViz config and bridges
+- RGL LiDAR plugin support (front and omni patterns)
+- Auto‑forward helper, rosbag auto‑record, and gamepad teleop
 
-## Getting Started
+## Requirements
 
- * Watch the [Release 2.3 Highlight Video](https://vimeo.com/851696025).
- * The [VRX Wiki](https://github.com/osrf/vrx/wiki) provides documentation and tutorials.
- * The instructions assume a basic familiarity with the ROS environment and Gazebo.  If these tools are new to you, we recommend starting with the excellent [ROS Tutorials](http://wiki.ros.org/ROS/Tutorials)
- * For technical problems, please use the [project issue tracker](https://github.com/osrf/vrx/issues) to describe your problem or request support.
+- ROS 2 Jazzy + Gazebo Harmonic set up in your environment
+- PyYAML for the generator:
+  - Debian/Ubuntu: `sudo apt-get install -y python3-yaml`
+  - Or via pip: `python3 -m pip install --user pyyaml`
+- RGL Gazebo plugin if you need LiDAR (see link below)
 
-## Reference
+## Quick start
 
-If you use the VRX simulation in your work, please cite our summary publication, [Toward Maritime Robotic Simulation in Gazebo](https://wiki.nps.edu/display/BB/Publications?preview=/1173263776/1173263778/PID6131719.pdf):
+Build and source:
 
+```sh
+colcon build --merge-install && source install/setup.zsh
 ```
-@InProceedings{bingham19toward,
-  Title                    = {Toward Maritime Robotic Simulation in Gazebo},
-  Author                   = {Brian Bingham and Carlos Aguero and Michael McCarrin and Joseph Klamo and Joshua Malia and Kevin Allen and Tyler Lum and Marshall Rawson and Rumman Waqar},
-  Booktitle                = {Proceedings of MTS/IEEE OCEANS Conference},
-  Year                     = {2019},
-  Address                  = {Seattle, WA},
-  Month                    = {October}
-}
+
+Generate URDF and launch (one‑shot):
+
+```sh
+ros2 launch vrx_gz generate_and_viz.launch.py \
+  component_yaml:=$(ros2 pkg prefix vrx_gazebo)/share/vrx_gazebo/config/wamv_config/component_config_rgl.yaml \
+  thruster_yaml:=$(ros2 pkg prefix vrx_gazebo)/share/vrx_gazebo/config/wamv_config/thruster_config_mini.yaml \
+  wamv_target:=$PWD/tmp/wamv_rgl_mini.urdf \
+  config_file:=$(ros2 pkg prefix vrx_gz)/share/vrx_gz/config/water_only_wamv_40_mini.yaml
 ```
-## 🛠️ Getting Help and Contributing
 
-VRX is an open source project supported by the community. If you run into issues, need help, or have suggestions:
+Manual two‑step (optional):
 
-- 💬 **Ask for help or report bugs** by opening an [issue](https://github.com/osrf/vrx/issues). Please include as much detail as possible, including:
-  - Steps to reproduce the issue
-  - Your system setup (OS, ROS version, etc.)
-  - Relevant error messages or logs
+```sh
+# 1) Generate URDF
+ros2 launch vrx_gazebo generate_wamv.launch.py \
+  component_yaml:=$(ros2 pkg prefix vrx_gazebo)/share/vrx_gazebo/config/wamv_config/component_config_rgl.yaml \
+  thruster_yaml:=$(ros2 pkg prefix vrx_gazebo)/share/vrx_gazebo/config/wamv_config/thruster_config_mini.yaml \
+  wamv_target:=./tmp/wamv_rgl_mini.urdf
 
-- 🛠️ **Found a fix or improvement?** We welcome contributions! Submit a [pull request](https://github.com/osrf/vrx/pulls) with your proposed changes.
+# 2) Launch sim and override URDF if desired
+ros2 launch vrx_gz tunnel_viz.launch.py \
+  config_file:=$(ros2 pkg prefix vrx_gz)/share/vrx_gz/config/water_only_wamv_40_mini.yaml \
+  urdf:=./tmp/wamv_rgl_mini.urdf
+```
 
-- 📫 **Please do not email the maintainers with technical questions.** Using GitHub issues helps ensure that questions and solutions are visible and searchable for the whole community.
+Notes:
 
-Your feedback and participation help make VRX better for everyone — thank you for contributing!
+- Scenario YAMLs accept relative `urdf` paths; these are resolved against your current working directory. Passing `urdf:=...` on the command line overrides the YAML.
+- RViz can be toggled via YAML (`launch.rviz.enable/config`) or via launch args (`rviz`, `rviz_config`).
 
-## Contributors
+## Configuration
 
-> [!NOTE]
-> The [Honu Robotics](https://honurobotics.com) team, thanks to the
-> sponsorship of [RoboNation](https://robonation.org/) is currently the
-> maintainer of this repository.
+Key config files (installed under `share/vrx_gz/config` and `share/vrx_gazebo/config`):
 
-We continue to receive important improvements from the community.  We have done our best to document this on our [Contributors Wiki](https://github.com/osrf/vrx/wiki/Contributors).
+- `vrx_gz/config/water_only_wamv_40_mini.yaml` — scenario (world/rviz/auto‑forward/rosbag/teleop); uses a relative URDF by default
+- `vrx_gazebo/config/wamv_config/component_config_rgl.yaml` — sensors, RGL patterns, cameras, GPS/IMU
+- `vrx_gazebo/config/wamv_config/thruster_config_mini.yaml` — mini hull thruster layout
+
+You can adapt the YAMLs and regenerate the URDF at any time.
+
+## Data recording and teleop
+
+- Enable `rosbag.enable: true` in the scenario to auto‑start `ros2 bag record` after a delay.
+- Example topics: `/wamv/sensors/imu/data`, `/wamv/scan_front`, `/wamv/scan_omni`.
+- Launch gamepad teleop via `ros2 launch vrx_gz usv_joy_teleop.py`.
+
+## Performance tips
+
+- If RViz feels laggy, lower camera FPS/resolution in your sensor config.
+
+## RGL Gazebo plugin
+
+Project: <https://github.com/RobotecAI/RGLGazeboPlugin>
+
+Installation: <https://github.com/RobotecAI/RGLGazeboPlugin#installation>
+
+## More docs
+
+See the detailed usage guide at `src/vrx_tunnel/doc/command.md`.
+
+## Upstream VRX
+
+This workspace builds on the upstream VRX project. For tutorials and reference:
+
+- VRX Wiki: <https://github.com/osrf/vrx/wiki>
+- Release video (v2.3): <https://vimeo.com/851696025>
+
 

@@ -1,0 +1,11 @@
+# Thruster configuration for the scaled 0.72 x 0.80 x 0.44 m hull
+# Coordinates follow the base_link frame (x forward, y left, z up)
+engine:
+  - prefix: "left"
+    position: "-0.42 0.28 0.22"
+    orientation: "0.0 0.0 0.0"
+    prop_offset_x: 0.0
+  - prefix: "right"
+    position: "-0.42 -0.28 0.22"
+    orientation: "0.0 0.0 0.0"
+    prop_offset_x: 0.0

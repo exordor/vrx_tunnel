@@ -1,88 +1,95 @@
-# VRX-GZ 使用手册
+# VRX-GZ User Guide
 
-## 编译
+## Build
 
 ```sh
 colcon build --merge-install
 ```
 
-## 安装
+## Setup
 
 ```sh
 source install/setup.zsh
 ```
 
-## 编译并安装
+## Build & Setup in one line
 
 ```sh
 colcon build --merge-install && source install/setup.zsh
 ```
 
-## 机器人urdf
+## Generate the WAM-V URDF
 
-```sh
-ros2 launch vrx_gazebo generate_wamv.launch.py component_yaml:=$(ros2 pkg prefix vrx_gazebo)/share/vrx_gazebo/config/wamv_config/example_component_config_rgl.yaml wamv_target:=./tmp/wamv_rgl.urdf
-```
-
-Prereqs: ensure PyYAML is available for the generator:
+Prerequisite: ensure PyYAML is available for the generator
 
 - Debian/Ubuntu: `sudo apt-get install -y python3-yaml`
 - Or via pip: `python3 -m pip install --user pyyaml`
 
-Then generate the WAM-V URDF with the RGL config:
+Recommended (portable paths):
 
 ```sh
-ros2 launch vrx_gazebo generate_wamv.launch.py component_yaml:=$(ros2 pkg prefix vrx_gazebo)/share/vrx_gazebo/config/wamv_config/example_component_config_rgl.yaml wamv_target:=./tmp/wamv_rgl.urdf
+ros2 launch vrx_gazebo generate_wamv.launch.py \
+  component_yaml:=$(ros2 pkg prefix vrx_gazebo)/share/vrx_gazebo/config/wamv_config/component_config_rgl.yaml \
+  thruster_yaml:=$(ros2 pkg prefix vrx_gazebo)/share/vrx_gazebo/config/wamv_config/thruster_config_mini.yaml \
+  wamv_target:=./tmp/wamv_rgl_mini.urdf
 ```
 
-## 运行
+Notes:
+
+- `wamv_target` may be a relative path (resolved against your current working directory).
+- You can customize the component/thruster YAMLs to match your sensor suite and thruster layout.
+
+## Run the simulation
+
+Option A — one-shot (generate URDF, then start sim + RViz):
 
 ```sh
-ros2 launch vrx_gz tunnel_viz.launch.py config_file:=$(ros2 pkg prefix vrx_gz)/share/vrx_gz/config/water_only_wamv.yaml
+ros2 launch vrx_gz generate_and_viz.launch.py \
+  component_yaml:=$(ros2 pkg prefix vrx_gazebo)/share/vrx_gazebo/config/wamv_config/component_config_rgl.yaml \
+  thruster_yaml:=$(ros2 pkg prefix vrx_gazebo)/share/vrx_gazebo/config/wamv_config/thruster_config_mini.yaml \
+  wamv_target:=$PWD/tmp/wamv_rgl_mini.urdf \
+  config_file:=$(ros2 pkg prefix vrx_gz)/share/vrx_gz/config/water_only_wamv_40_mini.yaml
 ```
 
-说明：
+Option B — launch only (URDF already generated):
 
-- `launch` 配置块集中启动参数：
-  - `launch.world/sim_mode/headless/paused/extra_gz_args`
-  - `launch.rviz.enable` 与 `launch.rviz.config`
-- 模型与自动前进参数仍写在同一文件：
-  - `auto_forward.enable`：是否启用自动前进
-  - `auto_forward.thrust/bias/rate/duration/start_delay`：推力、差分、频率、持续时间与启动延迟（秒）
-    - 未指定时默认延迟 5s 后再推力启动，可用 `start_delay: 0.0` 取消
-- `rosbag` 配置块启用 ros2 bag 录制：
-  - `rosbag.enable`：是否开启录制（默认关闭）
-  - `rosbag.format`：存储格式，支持 `sqlite3` / `mcap` 等 `ros2 bag` 支持的格式
-  - `rosbag.start_delay`：仿真启动后延迟多少秒再开始录制
-  - `rosbag.topics`：需要录制的 topic 列表
-- 如需临时调整，仍可在命令行覆盖单个参数（例如 `world:=...`）。
+```sh
+ros2 launch vrx_gz tunnel_viz.launch.py \
+  config_file:=$(ros2 pkg prefix vrx_gz)/share/vrx_gz/config/water_only_wamv_40_mini.yaml \
+  urdf:=./tmp/wamv_rgl_mini.urdf
+```
 
-## 数据录制
+Notes:
 
-配置文件中启用 `rosbag.enable: true` 后，启动仿真时会在 `rosbag.start_delay` 秒后自动运行 `ros2 bag record`（默认为 0 秒）。
+- The scenario YAML (`water_only_wamv_40_mini.yaml`) contains `launch` settings and model config. Any `urdf` field in the YAML can be a relative path; it is resolved against the current working directory. The `urdf` launch arg, if provided, overrides the YAML.
+- You can override individual launch args on the command line (e.g., `world:=...`, `rviz:=false`).
+- RViz settings can be specified via YAML (`launch.rviz.enable/config`) or via the `rviz` / `rviz_config` launch args.
 
-- 录制目录：`<工作目录>/bag/<启动时间>`（例如 `~/code/tunnel_ws/bag/20250517_153000`）
-- 命令参数示例（由 launch 自动生成）：
+## Data recording
+
+Enable `rosbag.enable: true` in the scenario YAML to auto-start recording after `rosbag.start_delay` seconds (default 0).
+
+- Output dir: `<CWD>/bag/<timestamp>` (e.g., `~/code/tunnel_ws/bag/20250517_153000`)
+- Example command (spawned by the launch system):
 
 ```sh
 ros2 bag record -o ./bag/20250517_153000 -s mcap /clock /wamv/sensors/imu/data /wamv/scan_front
 ```
 
-若未配置 `topics`，则不会启动录制并在终端给出提示。
+If `topics` is empty, recording is skipped with a console notice.
 
-## 控制
+## Control (teleop)
 
 ```sh
 ros2 launch vrx_gz usv_joy_teleop.py
 ```
 
-IMU与点云：
+Topics:
 
-- IMU 推荐订阅：`/wamv/sensors/imu/data`（已统一为链接帧 `wamv/imu_wamv_link`）
-- RGL 点云：`/wamv/scan_front`、`/wamv/scan_omni`
+- IMU: `/wamv/sensors/imu/data` (link frame: `wamv/imu_wamv_link`)
+- RGL point clouds: `/wamv/scan_front`, `/wamv/scan_omni`
 
-
-## mola
+## MOLA examples
 
 ```sh
 MOLA_LIDAR_TOPIC=/wamv/scan_front \
@@ -108,8 +115,8 @@ MOLA_TUM_TRAJECTORY_OUTPUT=omni_map_estimated_trajectory.tum \
 mola-lo-gui-rosbag2
 ```
 
-## rgl plugin install
+## RGL Gazebo plugin
 
-https://github.com/RobotecAI/RGLGazeboPlugin
+Project: <https://github.com/RobotecAI/RGLGazeboPlugin>
 
-see their [installation instructions](https://github.com/RobotecAI/RGLGazeboPlugin#installation)
+See their installation instructions: <https://github.com/RobotecAI/RGLGazeboPlugin#installation>

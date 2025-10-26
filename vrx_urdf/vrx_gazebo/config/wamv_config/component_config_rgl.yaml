@@ -1,0 +1,75 @@
+lidar:
+  - name: RGLLidar_top
+    type: rgl
+    x: 0.40
+    y: 0.00
+    z: 0.35
+    R: 0.0
+    P: 0.0
+    Y: 0.0
+    update_rate: 20
+    min_range: 0.1
+    max_range: 20
+    update_on_paused_sim: true
+    topic: scan_omni
+    # frame is auto-bound to the link name (wamv/RGLLidar_top_link) by xacro.
+    # Leave empty or omit to avoid TF mismatches.
+    # frame: ""
+    # Path to your RGL pattern preset file
+    pattern_preset_path: $(find vrx_gz)/config/rgl_patterns/hesai_qt128_20hz_pattern.mat3x4f
+    # pattern_preset_path: $(find vrx_gz)/config/rgl_patterns/OusterOS1_64.mat3x4f
+    # Optional: override plugin IDs if your build differs
+    plugin_filename: RGLServerPluginInstance
+    plugin_name: rgl::RGLServerPluginInstance
+
+  - name: RGLLidar_front
+    type: rgl
+    # Mount under the hull, ahead of base
+    x: 0.40
+    y: 0.00
+    z: -0.10
+    R: 0.0
+    P: 0.00
+    Y: 0.0
+    update_rate: 20
+    min_range: 0.1
+    max_range: 40
+    update_on_paused_sim: true
+    topic: scan_front
+    # frame is auto-bound to the link name (wamv/RGLLidar_front_link) by xacro.
+    # Leave empty or omit to avoid TF mismatches.
+    # frame: ""
+    pattern_preset_path: $(find vrx_gz)/config/rgl_patterns/archimedean_spiral_pattern.mat3x4f
+    plugin_filename: RGLServerPluginInstance
+    plugin_name: rgl::RGLServerPluginInstance
+
+# Note:
+# - Excluding other sections (e.g., wamv_camera, wamv_gps, etc.) means they won't be created.
+# - With YAML generation enabled, default sensors in xacro are not added.
+
+wamv_camera:
+  - name: front_rgb_camera
+    visualize: False
+    x: 0.40
+    y: 0.00
+    z: 0.23
+    R: 0.0
+    P: 0.0
+    Y: 0.0
+
+wamv_gps:
+    - name: gps_wamv
+      x: -0.1
+      y: 0.0
+      z: 0.0
+      R: 0.0
+      P: 0.0
+      Y: 0.0
+wamv_imu:
+    - name: imu_wamv
+      x: 0.2
+      y: 0.0
+      z: 0.1
+      R: 0.0
+      P: 0.0
+      Y: 0.0

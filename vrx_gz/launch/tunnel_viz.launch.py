@@ -86,6 +86,33 @@ def launch_fn(context, *args, **kwargs):
         except Exception:
             config_data = {}
 
+    def _expand_path(p: str) -> str:
+        # Expand ~ and environment variables, then make absolute if still relative (cwd-based)
+        if not isinstance(p, str) or p.strip() == '':
+            return p
+        p2 = os.path.expandvars(os.path.expanduser(p))
+        if not os.path.isabs(p2):
+            p2 = os.path.abspath(os.path.join(os.getcwd(), p2))
+        return p2
+
+    def _rewrite_urdf_fields(obj):
+        # Recursively walk dict/list and expand 'urdf' string fields
+        if isinstance(obj, dict):
+            new_obj = {}
+            for k, v in obj.items():
+                if k == 'urdf' and isinstance(v, str):
+                    new_obj[k] = _expand_path(v)
+                else:
+                    new_obj[k] = _rewrite_urdf_fields(v)
+            return new_obj
+        elif isinstance(obj, list):
+            return [_rewrite_urdf_fields(v) for v in obj]
+        else:
+            return obj
+
+    if isinstance(config_data, (dict, list)):
+        config_data = _rewrite_urdf_fields(config_data)
+
     sections = _config_sections(config_data)
 
     value = _lookup(sections, ['world', 'world_name'])
