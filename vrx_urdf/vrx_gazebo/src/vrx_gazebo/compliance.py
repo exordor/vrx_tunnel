@@ -109,7 +109,7 @@ class ThrusterCompliance:
             (thruster_type, self.config_dir)
         for i in params:
             if i not in self.numeric[thruster_type]['allowed_params']:
-                rclpy.logging.get_logger("compliance").error('%s parameter specification of not permitted' %
+                rclpy.logging.get_logger("compliance").error('%s parameter specification of %s not permitted' %
                              (i, thruster_type))
                 assert False
 

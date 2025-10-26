@@ -2,11 +2,11 @@
 <robot xmlns:xacro="http://ros.org/wiki/xacro" name="wam-v-components">
   <xacro:macro name="yaml_components">
     <!-- === lidar === -->
-      <xacro:lidar name="RGLLidar_top" type="rgl" x="0.7" y="0.0" z="1.8" R="0.0" P="0.0" Y="0.0" post_Y="0.0" update_rate="20" min_range="0.2" max_range="60" update_on_paused_sim="True" topic="scan_omni" frame="top_lidar_link" pattern_preset_path="$(find wamv_gazebo)/config/rgl_patterns/hesai_qt128_20hz_pattern.mat3x4f" plugin_filename="RGLServerPluginInstance" plugin_name="rgl::RGLServerPluginInstance" />
-      <xacro:lidar name="RGLLidar_front" type="rgl" x="1.2" y="0.0" z="-0.2" R="0.0" P="0.0" Y="0.0" post_Y="0.0" use_post="False" update_rate="20" min_range="0.2" max_range="60" update_on_paused_sim="True" topic="scan_front" frame="front_lidar_link" pattern_preset_path="$(find wamv_gazebo)/config/rgl_patterns/hesai_qt128_20hz_pattern.mat3x4f" plugin_filename="RGLServerPluginInstance" plugin_name="rgl::RGLServerPluginInstance" />
+      <xacro:lidar name="RGLLidar_top" type="rgl" x="0.7" y="0.0" z="1.8" R="0.0" P="0.0" Y="0.0" update_rate="20" min_range="0.2" max_range="60" update_on_paused_sim="True" topic="scan_omni" frame="top_lidar_link" pattern_preset_path="$(find wamv_gazebo)/config/rgl_patterns/hesai_qt128_20hz_pattern.mat3x4f" plugin_filename="RGLServerPluginInstance" plugin_name="rgl::RGLServerPluginInstance" />
+      <xacro:lidar name="RGLLidar_front" type="rgl" x="1.2" y="0.0" z="-0.2" R="0.0" P="0.0" Y="0.0" update_rate="20" min_range="0.2" max_range="60" update_on_paused_sim="True" topic="scan_front" frame="front_lidar_link" pattern_preset_path="$(find wamv_gazebo)/config/rgl_patterns/hesai_qt128_20hz_pattern.mat3x4f" plugin_filename="RGLServerPluginInstance" plugin_name="rgl::RGLServerPluginInstance" />
 
     <!-- === wamv_camera === -->
-      <xacro:wamv_camera name="front_rgb_camera" visualize="False" x="0.75" y="0.0" z="1.5" R="0.0" P="${radians(15)}" Y="0.0" post_Y="0.0" />
+      <xacro:wamv_camera name="front_rgb_camera" visualize="False" x="0.75" y="0.0" z="1.5" R="0.0" P="${radians(15)}" Y="0.0" />
 
   </xacro:macro>
 </robot>

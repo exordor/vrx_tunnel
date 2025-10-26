@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <sdf version="1.9">
- <model name="WTunnel">
+ <model name="tunnel10">
    <static>true</static>
    <link name="base_link">
      <!-- Disable complex mesh collision to avoid ODE AABB crash -->

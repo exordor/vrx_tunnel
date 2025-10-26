@@ -44,8 +44,6 @@ lidar:
         R
         P
         Y
-        post_Y
-        post_z_from
         update_rate
         min_range
         max_range
@@ -55,7 +53,6 @@ lidar:
         pattern_preset_path
         plugin_filename
         plugin_name
-        use_post
 
 wamv_ball_shooter:
     num: 1

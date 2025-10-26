@@ -5,3 +5,8 @@ syntax: glob
 *.orig
 *.*~
 *.pyc
+__pycache__/
+.idea/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/

@@ -4,3 +4,4 @@ engine:
         prefix
         position
         orientation
+        prop_offset_x

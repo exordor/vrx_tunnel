@@ -7,7 +7,6 @@ lidar:
     R: 0.0
     P: 0.0
     Y: 0.0
-    post_Y: 0.0
     update_rate: 20
     min_range: 0.2
     max_range: 20
@@ -32,8 +31,6 @@ lidar:
     R: 0.0
     P: 0.05
     Y: 0.0
-    post_Y: 0.0
-    use_post: false
     update_rate: 20
     min_range: 0.2
     max_range: 20
@@ -59,7 +56,6 @@ wamv_camera:
     R: 0.0
     P: ${radians(15)}
     Y: 0.0
-    post_Y: 0.0
 
 wamv_gps:
     - name: gps_wamv

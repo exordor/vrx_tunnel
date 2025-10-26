@@ -1,46 +1,64 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://ros.org/wiki/xacro" name="wam-v-two-engines">
   <!-- Macro for inserting an engine with its propeller. -->
-  <xacro:macro name="engine" params="prefix position:='0 0 0' orientation:='0 0 0'">
+  <xacro:macro name="engine" params="prefix position:='0 0 0' orientation:='0 0 0' scale_x:=1 scale_y:=1 scale_z:=1 prop_offset_x:=0.278156">
+    <xacro:property name="engine_scale_uniform" value="${(scale_x + scale_y + scale_z) / 3.0}"/>
+    <xacro:property name="engine_mass_scale" value="${engine_scale_uniform * engine_scale_uniform * engine_scale_uniform}"/>
+    <xacro:property name="engine_inertia_scale" value="${engine_mass_scale * engine_scale_uniform * engine_scale_uniform}"/>
+
+    <!-- Visual-only box to represent the shrunken thruster housing -->
+    <xacro:property name="engine_visual_size_x" value="0.05"/>
+    <xacro:property name="engine_visual_size_y" value="0.05"/>
+    <xacro:property name="engine_visual_size_z" value="0.44"/>
+    <xacro:property name="engine_visual_origin_z" value="${-0.5 * engine_visual_size_z}"/>
+
+    <!-- Visual propeller scale to achieve 0.1 m diameter (default diameter 0.48 m) -->
+    <xacro:property name="prop_visual_scale" value="${0.1 / 0.48}"/>
+    <xacro:property name="prop_mount_x" value="${-prop_offset_x * scale_x}"/>
+    <xacro:property name="prop_mount_z" value="${-0.509371 * scale_z}"/>
+
     <link name="${namespace}/${prefix}_engine_link">
       <visual>
+        <origin xyz="0 0 ${engine_visual_origin_z}" rpy="0 0 0" />
         <geometry>
-          <mesh filename="package://wamv_description/models/engine/mesh/engine.dae"/>
+          <box size="${engine_visual_size_x} ${engine_visual_size_y} ${engine_visual_size_z}" />
         </geometry>
       </visual>
       <collision name="${prefix}_engine_vertical_axis_collision">
-        <origin xyz="-0.16 0 -0.24" rpy="0 0 0" />
+        <origin xyz="${-0.16*scale_x} 0 ${-0.24*scale_z}" rpy="0 0 0" />
         <geometry>
-          <box size="0.2 0.15 0.83" />
+          <box size="${0.2*scale_x} ${0.15*scale_y} ${0.83*scale_z}" />
         </geometry>
       </collision>
       <collision name="${prefix}_engine_rear_end_collision">
-        <origin xyz="-0.34 0 0.12" rpy="0 0 0" />
+        <origin xyz="${-0.34*scale_x} 0 ${0.12*scale_z}" rpy="0 0 0" />
         <geometry>
-          <box size="0.12 0.15 0.12" />
+          <box size="${0.12*scale_x} ${0.15*scale_y} ${0.12*scale_z}" />
         </geometry>
       </collision>
       <inertial>
-        <mass value="15"/>
-        <inertia ixx="0.889245" ixy="0.0" ixz="0.0" iyy="0.911125" iyz="0.0" izz="0.078125"/>
+        <mass value="${15.0 * engine_mass_scale}"/>
+        <inertia ixx="${0.889245 * engine_inertia_scale}" ixy="0.0" ixz="0.0" iyy="${0.911125 * engine_inertia_scale}" iyz="0.0" izz="${0.078125 * engine_inertia_scale}"/>
       </inertial>
     </link>
 
+    <!-- Propeller link origin already captures the mount offset -->
     <link name="${namespace}/${prefix}_propeller_link">
       <visual>
+        <origin xyz="0 0 0" rpy="0 0 0" />
         <geometry>
-          <mesh filename="package://wamv_description/models/propeller/mesh/propeller.dae"/>
+          <mesh filename="package://wamv_description/models/propeller/mesh/propeller.dae" scale="${prop_visual_scale} ${prop_visual_scale} ${prop_visual_scale}"/>
         </geometry>
       </visual>
       <collision name="${prefix}_propeller_collision">
-        <origin xyz="-0.08 0 0" rpy="0 1.57 0" />
+        <origin xyz="0 0 0" rpy="0 1.57 0" />
         <geometry>
-          <cylinder length="0.18" radius="0.24" />
+          <cylinder length="${0.18*scale_z}" radius="${0.24*scale_y}" />
         </geometry>
       </collision>
       <inertial>
-        <mass value="0.5"/>
-        <inertia ixx="0.008545" ixy="0.0" ixz="0.0" iyy="0.008545" iyz="0.0" izz="0.0144"/>
+        <mass value="${0.5 * engine_mass_scale}"/>
+        <inertia ixx="${0.008545 * engine_inertia_scale}" ixy="0.0" ixz="0.0" iyy="${0.008545 * engine_inertia_scale}" iyz="0.0" izz="${0.0144 * engine_inertia_scale}"/>
       </inertial>
     </link>
 
@@ -56,10 +74,9 @@
       <axis rpy="0 0 0" xyz="1 0 0"/>
       <parent link="${namespace}/${prefix}_engine_link"/>
       <child link="${namespace}/${prefix}_propeller_link"/>
-      <origin rpy="0 0 0" xyz="-0.278156 0 -0.509371"/>
+      <origin rpy="0 0 0" xyz="${prop_mount_x} 0 ${prop_mount_z}"/>
       <limit effort="100" velocity="100" />
       <dynamics friction="0.05" damping="0.05" />
     </joint>
   </xacro:macro>
 </robot>
-

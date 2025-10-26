@@ -7,7 +7,6 @@ wamv_camera:
       R: 0.0
       P: ${radians(15)}
       Y: 0.0
-      post_Y: 0.0
     - name: front_right_camera
       visualize: False
       x: 0.75
@@ -16,7 +15,6 @@ wamv_camera:
       R: 0.0
       P: ${radians(15)}
       Y: 0.0
-      post_Y: 0.0
     - name: far_left_camera
       visualize: False
       x: 0.75
@@ -25,7 +23,6 @@ wamv_camera:
       R: 0.0
       P: ${radians(15)}
       Y: 0.0
-      post_Y: 0.0
 wamv_gps:
     - name: gps_wamv
       x: -0.85
@@ -51,7 +48,6 @@ lidar:
       R: 0.0
       P: ${radians(8)}
       Y: 0.0
-      post_Y: 0.0
 wamv_ball_shooter:
     - name: ball_shooter
       x: 0.55 
