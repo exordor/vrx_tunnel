@@ -17,31 +17,21 @@ This branch targets ROS 2 Jazzy and Gazebo Harmonic.
 
 ## Requirements
 
-- ROS 2 Jazzy + Gazebo Harmonic set up in your environment
-- PyYAML for the generator:
-  - Debian/Ubuntu: `sudo apt-get install -y python3-yaml`
-  - Or via pip: `python3 -m pip install --user pyyaml`
-- RGL Gazebo plugin if you need LiDAR (see link below)
+- ROS 2 Jazzy + Gazebo Harmonic
+- Python 3 with PyYAML: `sudo apt install python3-yaml`
+- [RGL Gazebo Plugin](https://github.com/RobotecAI/RGLGazeboPlugin)
 
-## Quick start
 
-Build and source:
+## Quick Start
 
-```sh
-colcon build --merge-install && source install/setup.zsh
+Build and run:
+
+```bash
+colcon build --merge-install
+source install/setup.bash
 ```
 
-Generate URDF and launch (one‑shot):
-
-```sh
-ros2 launch vrx_gz generate_and_viz.launch.py \
-  component_yaml:=$(ros2 pkg prefix vrx_gazebo)/share/vrx_gazebo/config/wamv_config/component_config_rgl.yaml \
-  thruster_yaml:=$(ros2 pkg prefix vrx_gazebo)/share/vrx_gazebo/config/wamv_config/thruster_config_mini.yaml \
-  wamv_target:=$PWD/tmp/wamv_rgl_mini.urdf \
-  config_file:=$(ros2 pkg prefix vrx_gz)/share/vrx_gz/config/water_only_wamv_40_mini.yaml
-```
-
-Manual two‑step (optional):
+Manual two‑step launch:
 
 ```sh
 # 1) Generate URDF
